@@ -12,7 +12,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { categorizeASINSearchTerms, exportASINAnalysis } from "./ASINUtils";
+import { categorizeASINSearchTerms, exportASINAnalysis } from "./asin-utils";
 
 const ASINTab = ({ processedData, exportToCSV }) => {
   const [asinData, setAsinData] = useState(null);

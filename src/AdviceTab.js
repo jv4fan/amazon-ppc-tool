@@ -67,29 +67,75 @@ const AdviceTab = ({
         <div className="export-buttons">
           {activeSection === "recommendations" && (
             <button
+              // Improve the export function in AdviceTab.js
               onClick={() => {
-                // Create a combined recommendations object for export
+                // Create a consistent export format for all recommendation types
                 const exportData = [
                   ...recommendations.exactNegative.map((word) => ({
-                    ...word,
+                    keyword: word.word, // Explicit field name mapping
+                    clicks: word.clicks,
+                    spend: word.spend,
+                    orders: word.orders || 0,
+                    acos: word.acos === 999 ? "∞" : word.acos.toFixed(2) + "%",
+                    ctr: word.ctr ? (word.ctr * 100).toFixed(2) + "%" : "0%",
+                    reliability: (word.reliability * 100).toFixed(0) + "%",
                     type: "Exact Negative",
                   })),
                   ...recommendations.phraseNegative.map((word) => ({
-                    ...word,
+                    keyword: word.word,
+                    clicks: word.clicks,
+                    spend: word.spend,
+                    orders: word.orders || 0,
+                    acos: word.acos === 999 ? "∞" : word.acos.toFixed(2) + "%",
+                    ctr: word.ctr ? (word.ctr * 100).toFixed(2) + "%" : "0%",
+                    reliability: (word.reliability * 100).toFixed(0) + "%",
                     type: "Phrase Negative",
                   })),
                   ...recommendations.increaseBid.map((term) => ({
-                    term: term["Search Term"],
-                    clicks: term.Clicks,
-                    orders: term.Orders,
-                    acos: term.ACOS,
+                    keyword: term["Search Term"] || "", // Ensure this field exists
+                    clicks: term.Clicks || 0,
+                    orders: term.Orders || 0,
+                    spend: term.Spend || 0,
+                    acos:
+                      term.ACOS !== undefined
+                        ? term.ACOS === 999
+                          ? "∞"
+                          : term.ACOS.toFixed(2) + "%"
+                        : "N/A",
+                    target_acos:
+                      (settings.targetAcosIndex * 100).toFixed(2) + "%",
+                    suggested_increase:
+                      Math.round(
+                        (1 -
+                          term.ACOS /
+                            (settings.targetAcosIndex *
+                              100 *
+                              settings.increaseBidLv)) *
+                          100
+                      ) + "%",
                     type: "Increase Bid",
                   })),
                   ...recommendations.decreaseBid.map((term) => ({
-                    term: term["Search Term"],
-                    clicks: term.Clicks,
-                    orders: term.Orders,
-                    acos: term.ACOS,
+                    keyword: term["Search Term"] || "",
+                    clicks: term.Clicks || 0,
+                    orders: term.Orders || 0,
+                    spend: term.Spend || 0,
+                    acos:
+                      term.ACOS !== undefined
+                        ? term.ACOS === 999
+                          ? "∞"
+                          : term.ACOS.toFixed(2) + "%"
+                        : "N/A",
+                    target_acos:
+                      (settings.targetAcosIndex * 100).toFixed(2) + "%",
+                    suggested_decrease:
+                      Math.min(
+                        50,
+                        Math.round(
+                          (term.ACOS / (settings.targetAcosIndex * 100) - 1) *
+                            100
+                        )
+                      ) + "%",
                     type: "Decrease Bid",
                   })),
                 ];
